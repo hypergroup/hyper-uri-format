@@ -1,0 +1,30 @@
+{
+  "name": "hyper-uri-format",
+  "version": "0.1.0",
+  "description": "encode/decode hyper uri components",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hypergroup/hyper-uri-format.git"
+  },
+  "keywords": [
+    "hyper"
+  ],
+  "author": "Cameron Bytheway <bytheway.cameron@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hypergroup/hyper-uri-format/issues"
+  },
+  "homepage": "https://github.com/hypergroup/hyper-uri-format",
+  "dependencies": {
+    "lru-cache": "^2.5.0",
+    "urlsafe-base64": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.1.0",
+    "should": "^4.4.2"
+  }
+}
