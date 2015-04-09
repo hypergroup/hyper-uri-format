@@ -4,6 +4,7 @@
 
 var base64 = require('urlsafe-base64');
 var LRU = require('lru-cache');
+var url = require('url');
 
 /**
  * Create a global cache for non-context functions
@@ -20,11 +21,13 @@ var globalCache = new LRU(1000);
 
 exports = module.exports = function(API_URL) {
   var cache = new LRU(1000);
+  var parts = API_URL ? url.parse(API_URL) : false;
+  if (parts) parts.href = parts.href.replace(/\/$/, '');
   return {
-    encode: encode.bind(null, cache, API_URL),
-    encodeParams: encodeParams.bind(null, cache, API_URL),
-    decode: decode.bind(null, cache, API_URL),
-    decodeParams: decodeParams.bind(null, cache, API_URL)
+    encode: encode.bind(null, cache, parts),
+    encodeParams: encodeParams.bind(null, cache, parts),
+    decode: decode.bind(null, cache, parts),
+    decodeParams: decodeParams.bind(null, cache, parts)
   };
 };
 
@@ -61,7 +64,7 @@ function encode(cache, API_URL, obj) {
   if (!obj.href) return obj;
 
   var href = API_URL ?
-    obj.href.replace(API_URL, '~') :
+    pack(obj.href, API_URL) :
     obj.href;
 
   var cached = cache.get(href);
@@ -98,7 +101,7 @@ function decode(cache, API_URL, str) {
   var decoded = base64.decode(str).toString().replace(/\0/g, '');
 
   var out = validate(decoded) ?
-    {href: decoded.replace(/^~/, API_URL)} :
+    {href: unpack(decoded, API_URL)} :
     str;
 
   // cache the decoded value since this ends up being pretty expensive
@@ -129,4 +132,24 @@ var INVALID_URL_CHARS = /[^a-z0-9\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\.\-\_\~\%]
 
 function validate(str) {
   return IS_URL.test(str) && !INVALID_URL_CHARS.test(str);
+}
+
+/**
+ * replace the API_URL with ~
+ */
+
+function pack(href, API_URL) {
+  var parts = url.parse(href);
+  if (parts.host !== API_URL.host || parts.pathname.indexOf(API_URL.pathname) !== 0) return href;
+  var pn = API_URL.pathname;
+  if (pn === '/') pn = '';
+  return parts.pathname.replace(pn, '~') + (parts.search || '');
+}
+
+/**
+ * replace ~ with API_URL
+ */
+
+function unpack(href, API_URL) {
+  return href.replace(/^~/, API_URL.href);
 }
