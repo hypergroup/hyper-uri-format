@@ -140,8 +140,8 @@ function validate(str) {
 
 function pack(href, API_URL) {
   var parts = url.parse(href);
-  if (parts.host !== API_URL.host || parts.pathname.indexOf(API_URL.pathname) !== 0) return href;
-  var pn = API_URL.pathname;
+  var pn = API_URL.pathname || '/';
+  if (parts.host !== API_URL.host || parts.pathname.indexOf(pn) !== 0) return href;
   if (pn === '/') pn = '';
   return parts.pathname.replace(pn, '~') + (parts.search || '');
 }

@@ -6,6 +6,12 @@ var should = require('should');
 var format = require('..');
 
 var roots = {
+  'ws://api.example.com': {
+    passes: {
+      'fi9wb2xscy9hTXJqUURGVTFJa05WUTFxZHBPeWhSOHdtREs': 'ws://api.example.com/polls/aMrjQDFU1IkNVQ1qdpOyhR8wmDK'
+    },
+    fails: []
+  },
   'http://example.com': {
     passes: {
       'L2FwaS91cmw': '/api/url',
@@ -48,8 +54,9 @@ describe('hyper-uri-format', function() {
         it('should encode "' + output + '" to "' + input + '"', function() {
           context.encode({href: output}).should.eql(input);
         });
-        it('should decode "' + input + '" to "' + output.replace(/^ws/, 'http') + '"', function() {
-          context.decode(input).should.eql({href: output.replace(/^ws/, 'http')});
+        var expected = root.indexOf('ws') === 0 ? output : output.replace(/^ws/, 'http');
+        it('should decode "' + input + '" to "' + expected + '"', function() {
+          context.decode(input).should.eql({href: expected});
         });
       });
 
@@ -66,7 +73,9 @@ describe('hyper-uri-format', function() {
 
       describe('params', function() {
         var params = Object.keys(passes).reduce(function(acc, key, i) {
-          acc[i] = {href: passes[key].replace(/^ws/, 'http')};
+          var output = passes[key];
+          var expected = root.indexOf('ws') === 0 ? output : output.replace(/^ws/, 'http');
+          acc[i] = {href: expected};
           return acc;
         }, {});
 
