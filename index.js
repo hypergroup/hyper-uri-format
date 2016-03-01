@@ -30,6 +30,7 @@ exports = module.exports = function(API_URL) {
     decodeParams: decodeParams.bind(null, cache, parts)
   };
 };
+exports['default'] = exports;
 
 /**
  * Expose the raw encode function
